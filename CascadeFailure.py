@@ -8,34 +8,43 @@ Created on Fri Sep  4 20:09:02 2020
 
 from InterdependentNetwork import InterdependentNetwork
 from Reports import Reports
+from nodeEntity import NodeEntity
+from ScaleFree import ScaleFreeNetwork
 
 import numpy as np
 
 class CascadeFailure:
-    def __init__(self,numberOfNode,couplingStrength,totalPowerForEachNode,indexOfDayOfCascadingFailure):
+    def __init__(self,numberOfNode,couplingStrength,totalPowerForEachNode):
         self.interdependentNetwork=InterdependentNetwork(numberOfNode,couplingStrength,totalPowerForEachNode)
-        self.indexOfDayOfCascadingFailure=indexOfDayOfCascadingFailure #-1 if you don't want cascading failure
         self.reports=Reports()
         
-    def distributePowerEqually(self,nodeEntity):
-        neighbors=self.interdependentNetwork.getNeighborsOfSameNetworkNotFailedYet(nodeEntity)
-        for i in range(0,len(neighbors)): 
-            self.interdependentNetwork.getNetwork(nodeEntity).increaseCurrentPower(i,self.interdependentNetwork.getNetwork(nodeEntity).currentPower[nodeEntity.nodeIndex]/len(neighbors))
             
-    def startSimulation(self,numberOfDays,assignPossibelityValue):
+    def startSimulation(self,numberOfDays,assignPossibelityValue,indexOfDayOfCascadingFailure,numberOfNodeForCascadingFailure):
+        self.numberOfNodeForCascadingFailure=numberOfNodeForCascadingFailure
+        self.reports.setReportGiantComponent()
+        self.indexOfDayOfCascadingFailure=indexOfDayOfCascadingFailure #-1 if you don't want cascading failure
         self.assignPossibelityValue=assignPossibelityValue
         for dayIndedx in range(0,numberOfDays):
             if(self.indexOfDayOfCascadingFailure==dayIndedx):
-                startCascadingFailureWithExtraPower()
+                self.startCascadingFailureWithExtraPowerToCentralNode()
             self.everyDayProcess()
         
         
     def everyDayProcess(self):
+        self.generateReportsForEveryDay() 
         nodes=self.interdependentNetwork.getListOfAllNode()
+        #self.generateReportsForEveryDay() 
         for i in range(0,len(nodes)):
             self.AssignPowerOfThisDayToNodes(nodes[i])
+        #self.generateReportsForEveryDay() 
+        for i in range(0,len(nodes)):
             self.handlePowerOfThisDayToNodes(nodes[i])
-        self.generateReportsForEveryDay() 
+        #self.generateReportsForEveryDay() 
+        self.listOfNewFailes=[]
+        for i in range(0,len(nodes)):
+            self.decitionAboutDistributePower(nodes[i])
+        for i in range(0,len(self.listOfNewFailes)):
+            self.distributePowerEqually(self.listOfNewFailes[i][0],self.listOfNewFailes[i][1]) 
         
     def AssignPowerOfThisDayToNodes(self,nodeEntity):
         assignRandomValue = np.random.poisson(self.assignPossibelityValue, size=1)[0]
@@ -44,16 +53,33 @@ class CascadeFailure:
         
     def handlePowerOfThisDayToNodes(self,nodeEntity):
         self.interdependentNetwork.decreaseCurrentPowerForOneDay(nodeEntity)
-        if self.interdependentNetwork.isNodeFail(nodeEntity):
-            self.distributePowerEqually(nodeEntity)
-            
-    
-    def generateReportsForEveryDay(self):
-        self.reports.reportGiantComponent.append(self.interdependentNetwork.sizeOfGiantComponent())
         
-      
-    def startCascadingFailureWithExtraPower(self):
-        self.interdependentNetwork.increaseCurrentPower(nodeEntity,assignRandomValue)
+        
+    def decitionAboutDistributePower(self,nodeEntity):
+        if self.interdependentNetwork.isNodeFail(nodeEntity):
+            totalPowerOfThisNode=self.interdependentNetwork.getNetwork(nodeEntity).currentPower[nodeEntity.nodeIndex]
+            self.listOfNewFailes.append([nodeEntity,totalPowerOfThisNode]) 
+    
+    def distributePowerEqually(self,nodeEntity,totalPower):
+        neighbors=self.interdependentNetwork.getNeighborsOfSameNetworkNotFailedYet(nodeEntity)
+        if(len(neighbors)>0 and totalPower>0):
+            for i in range(0,len(neighbors)): 
+                self.interdependentNetwork.increaseCurrentPower(NodeEntity(nodeEntity.networkIndex,neighbors[i].nodeIndex),(int)(totalPower/len(neighbors)))
+            self.interdependentNetwork.getNetwork(nodeEntity).currentPower[nodeEntity.nodeIndex]=0
+            
+    def generateReportsForEveryDay(self):
+        sizeOfGiantComponent=self.interdependentNetwork.sizeOfGiantComponent()
+        self.reports.reportGiantComponent.append(sizeOfGiantComponent)
+        currentPower1List=self.interdependentNetwork.network1.currentPower
+        currentPower2List=self.interdependentNetwork.network2.currentPower
+        self.reports.networkCurrentPower(currentPower1List,currentPower2List)
+        
+
+    def startCascadingFailureWithExtraPowerToCentralNode(self):
+        assignExtraValue = 800
+        centralNodes=self.interdependentNetwork.findingCentrality(self.numberOfNodeForCascadingFailure)
+        for i in range(0,len(centralNodes)):
+            self.interdependentNetwork.increaseCurrentPower(centralNodes[0],assignExtraValue)
         
         
             

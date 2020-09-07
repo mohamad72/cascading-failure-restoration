@@ -6,7 +6,7 @@ Created on Fri Sep  4 14:50:57 2020
 """
 import matplotlib.pyplot as plt
 import networkx as nx
-import networkx.algorithms.centrality as centrality
+import networkx.algorithms.centrality as Centrality
 
 class ScaleFreeNetwork:
     def __init__(self,numberOfNode,totalPowerForEachNode):
@@ -14,13 +14,10 @@ class ScaleFreeNetwork:
         self.currentPower=[0]*numberOfNode
         self.totalPower=[totalPowerForEachNode]*numberOfNode
         self.MeanPower=[0]*numberOfNode
-        
-    def plotGraphScaleFree(self):
-        nx.draw(self.graph,with_labels=True)
-        plt.show()
+    
         
     def isNodeFail(self,nodeIndex):
-        return self.currentPower[nodeIndex]>self.totalPower[nodeIndex]
+        return self.currentPower[nodeIndex]>0
     
     def getNeighbors(self,nodeIndex):
         return [n for n in self.graph.neighbors(nodeIndex)] 
@@ -47,5 +44,15 @@ class ScaleFreeNetwork:
     
     def decreaseCurrentPowerForOneDay(self,nodeIndex):
         self.decreaseCurrentPower(nodeIndex,self.totalPower[nodeIndex])
+        
+    def findingCentrality(self,numberOfCenralityNode):
+        degreeCentralityArray=list(Centrality.degree_centrality(self.graph).values())
+        sortedDegreeCentralityArray=sorted(degreeCentralityArray)
+        IndexOfSortedDegreeCentralityArray=sorted(range(len(degreeCentralityArray)), key=lambda x: degreeCentralityArray[x])
+        output=[]
+        for i in range(0,numberOfCenralityNode):
+            output.append([IndexOfSortedDegreeCentralityArray[-i-1],sortedDegreeCentralityArray[-i-1]])
+        return output
+        
         
     

@@ -11,11 +11,15 @@ from nodeEntity import NodeEntity
 from Utils import getKeysByValue
 from Utils import getColumnsFromList
 import random
+from Reports import Reports
+
 
 class InterdependentNetwork:
     def __init__(self,numberOfNode,couplingStrength,totalPowerForEachNode):
         self.network1=ScaleFreeNetwork(numberOfNode,totalPowerForEachNode)
+        Reports().plotGraphScaleFree(self.network1.graph)
         self.network2=ScaleFreeNetwork(numberOfNode,totalPowerForEachNode)
+        Reports().plotGraphScaleFree(self.network2.graph)
         self.makingConnectionBetweenTwoNetworks(couplingStrength)
     
     def makingConnectionBetweenTwoNetworks(self,couplingStrength):
@@ -55,8 +59,19 @@ class InterdependentNetwork:
         return False
     
     def findingCentrality(self,numberOfCenralityNode):
-        
-        
+        centalNetwork1=self.network1.findingCentrality(numberOfCenralityNode)
+        centalNetwork2=self.network2.findingCentrality(numberOfCenralityNode)
+        output=[]
+        for i in range(0,numberOfCenralityNode):
+            if(centalNetwork1[0][1]>centalNetwork1[0][1]):
+                output.append(NodeEntity(1, centalNetwork1[0][0]))
+                centalNetwork1.pop(0)
+            else:
+                output.append(NodeEntity(2, centalNetwork2[0][0]))
+                centalNetwork2.pop(0)
+                
+        return output
+                
     
     def getNeighborsOfSameNetworkNotFailedYet(self,nodeEntity):
         output=[]
