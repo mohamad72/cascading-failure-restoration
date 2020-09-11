@@ -81,6 +81,20 @@ class InterdependentNetwork:
                 output.append(NodeEntity(nodeEntity.networkIndex,neighbors[i]))
         return output
     
+    def getVulnerabilityOfSomeNodeEntities(self,nodeEntities):
+        output=[]
+        for i in range(0,len(nodeEntities)):
+            if nodeEntities[i].networkIndex==1:
+                output.append(self.network1.degreeCentralityCoef[nodeEntities[i].nodeIndex])
+            else:
+                output.append(self.network2.degreeCentralityCoef[nodeEntities[i].nodeIndex])
+        Min=min(output)
+        Max=max(output)
+        Median=(Max+Min)
+        for i in range(0,len(output)):
+            output[i]=Median-output[i]
+        return output
+        
     def getCouple(self,nodeEntity):
         coulmnOfConnection=getColumnsFromList(self.connectionBetweenNetworks,nodeEntity.networkIndex-1)
         if nodeEntity.nodeIndex in coulmnOfConnection:

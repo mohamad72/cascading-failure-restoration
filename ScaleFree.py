@@ -10,10 +10,12 @@ import networkx.algorithms.centrality as Centrality
 
 class ScaleFreeNetwork:
     def __init__(self,numberOfNode,totalPowerForEachNode):
-        self.graph = nx.powerlaw_cluster_graph(numberOfNode,(int)(numberOfNode/10),0.1)
+        #self.graph = nx.powerlaw_cluster_graph(numberOfNode,(int)(numberOfNode/10),0.1)
+        self.graph = nx.barabasi_albert_graph(numberOfNode,(int)(numberOfNode/20))
         self.currentPower=[0]*numberOfNode
         self.totalPower=[totalPowerForEachNode]*numberOfNode
         self.MeanPower=[0]*numberOfNode
+        self.degreeCentralityCoef=list(Centrality.degree_centrality(self.graph).values())
     
         
     def isNodeFail(self,nodeIndex):
@@ -53,6 +55,7 @@ class ScaleFreeNetwork:
         for i in range(0,numberOfCenralityNode):
             output.append([IndexOfSortedDegreeCentralityArray[-i-1],sortedDegreeCentralityArray[-i-1]])
         return output
+
         
         
     

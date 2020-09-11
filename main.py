@@ -8,14 +8,21 @@ Created on Sat Sep  5 00:23:08 2020
 
 from CascadeFailure import CascadeFailure
 
-ourSimulation=CascadeFailure(numberOfNode=20,
+ourSimulation=CascadeFailure(numberOfNode=100,
                              couplingStrength=1.0,
                              totalPowerForEachNode=100)
-
-
-ourSimulation.startSimulation(numberOfDays=20,
-                              assignPossibelityValue=98,
-                              indexOfDayOfCascadingFailure=1,
-                              numberOfNodeForCascadingFailure=10)
-
-ourSimulation.reports.plotChartGiantComponent()
+assignPossibelityValue=90
+numberOfDays=10
+numberOfNodeForCascadingFailure=40
+numberOfNodesForRestoration=40
+sizeOfGiantAtTheEndOfEachCase=[]
+for i in range(0,numberOfDays):
+        ourSimulation.startSimulation(numberOfDays=numberOfDays,
+        assignPossibelityValue=assignPossibelityValue,
+        indexOfDayOfCascadingFailure=8,
+        numberOfNodeForCascadingFailure=numberOfNodeForCascadingFailure,
+        numberOfNodesForRestoration=numberOfNodesForRestoration,
+        indexOfDayOfZhongRestoration=-1) 
+        sizeOfGiantAtTheEndOfEachCase.append(ourSimulation.giantAtTheEnd)
+    
+ourSimulation.reports.plotChartGiantComponent(sizeOfGiantAtTheEndOfEachCase)

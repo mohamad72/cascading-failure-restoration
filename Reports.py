@@ -11,11 +11,22 @@ import networkx as nx
 class Reports:
         
     def plotChartGiantComponent(self):
+        self.plotChartGiantComponent(self.reportGiantComponent)
+        
+    def plotChartGiantComponent(self,listOfChart):
         plt.ylim(top=1.05)
         plt.ylim(bottom=-0.05)
-        plt.plot(self.reportGiantComponent)
+        plt.plot(listOfChart)
         plt.show()
-        
+     
+    def plotMultiChartGiantComponent(self,numberOfRestore,listOfChart):
+        plt.ylim(top=1.05)
+        plt.ylim(bottom=-0.05)
+        for i in range(0,len(listOfChart)):
+            plt.plot(listOfChart[i])
+        plt.gca().legend(('R={} '.format(numberOfRestore[0]),'R={} '.format(numberOfRestore[1]),'R={} '.format(numberOfRestore[2]),'R={} '.format(numberOfRestore[3])))
+        plt.plot(listOfChart)
+        plt.show()
         
     def setReportGiantComponent(self):
         self.reportGiantComponent=[]
